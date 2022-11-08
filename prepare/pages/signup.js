@@ -19,11 +19,10 @@ const Signup = () => {
   const [passwordError, setPasswordError] = useState(false);
   const onChangePasswordCheck = useCallback(
     (e) => {
-      console.log(e.target.value === password);
+      setPasswordError(e.target.value !== password);
       setPasswordCheck(e.target.value);
-      setPasswordError(e.target.value === password);
     },
-    [password, passwordCheck]
+    [password]
   );
 
   const [term, setTerm] = useState('');
@@ -82,7 +81,7 @@ const Signup = () => {
             required
             onChange={onChangePasswordCheck}
           />
-          {!passwordError && (
+          {passwordError && (
             <ErrorMessage>비밀번호가 일치하지 않습니다.</ErrorMessage>
           )}
         </div>
