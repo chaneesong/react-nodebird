@@ -39,7 +39,7 @@ const LoginForm = () => {
         <br />
         <Input
           name='user-id'
-          type='email'
+          type='text'
           value={id}
           onChange={onChangeId}
           required
