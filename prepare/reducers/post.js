@@ -7,7 +7,7 @@ export const initialState = {
         nickname: 'song',
       },
       content: 'first post #hashtag #express',
-      Image: [
+      Images: [
         {
           src: 'https://noticon-static.tammolo.com/dgggcrkxq/image/upload/v1566557331/noticon/d5hqar2idkoefh6fjtpu.png',
         },
@@ -18,7 +18,7 @@ export const initialState = {
       Comments: [
         {
           User: { nickname: 'kim' },
-          content: 'second post',
+          content: 'first comment',
         },
       ],
     },
@@ -36,8 +36,8 @@ const dummyPost = {
   id: 2,
   content: 'dummy data',
   User: {
-    id: 1,
-    nickname: 'song',
+    id: 'gigo96',
+    nickname: 'gigo96',
   },
   Images: [],
   Comments: [],
