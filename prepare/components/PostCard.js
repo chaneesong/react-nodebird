@@ -6,11 +6,12 @@ import {
   RetweetOutlined,
 } from '@ant-design/icons';
 import PropTypes from 'prop-types';
-import { Avatar, Button, Card, Popover } from 'antd';
+import { Avatar, Button, Card, List, Popover, Comment } from 'antd';
 import React, { useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import PostImages from '../components/PostImages';
-import { useSelector } from 'react-redux';
+import CommentForm from './CommentForm';
 
 const PostCard = ({ post }) => {
   const id = useSelector((state) => state.user.me?.id);
@@ -26,7 +27,7 @@ const PostCard = ({ post }) => {
   }, []);
 
   return (
-    <div style={{ marginBottom: 10 }}>
+    <div style={{ marginBottom: '20px' }}>
       <Card
         cover={post.Images[0] && <PostImages images={post.Images} />}
         actions={[
@@ -69,9 +70,25 @@ const PostCard = ({ post }) => {
         <Content />
         <Buttons></Buttons> */}
       </Card>
-      {commentFormOpened && <div>comment section</div>}
-      {/* <CommentForm />
-      <Comments /> */}
+      {commentFormOpened && (
+        <>
+          <CommentForm post={post} />
+          <List
+            header={`${post.Comments.length}개의 댓글`}
+            itemLayout='horizontal'
+            dataSource={post.Comments}
+            renderItem={(item) => (
+              <li>
+                <Comment
+                  author={item.User.nickname}
+                  avatar={<Avatar>{item.User.nickname[0]}</Avatar>}
+                  content={item.content}
+                />
+              </li>
+            )}
+          />
+        </>
+      )}
     </div>
   );
 };
