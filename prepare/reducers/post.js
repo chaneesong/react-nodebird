@@ -20,6 +20,10 @@ export const initialState = {
           User: { nickname: 'kim' },
           content: 'first comment',
         },
+        {
+          User: { nickname: 'test' },
+          content: 'second comment',
+        },
       ],
     },
   ],
