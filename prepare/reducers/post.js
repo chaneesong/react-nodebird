@@ -14,6 +14,9 @@ export const initialState = {
         {
           src: 'https://noticon-static.tammolo.com/dgggcrkxq/image/upload/v1567008394/noticon/ohybolu4ensol1gzqas1.png',
         },
+        {
+          src: 'https://noticon-static.tammolo.com/dgggcrkxq/image/upload/v1667528160/noticon/jkteb0zahggo46okznlh.png',
+        },
       ],
       Comments: [
         {
