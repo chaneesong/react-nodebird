@@ -1,3 +1,5 @@
+import { ADD_POST, ADD_COMMENT } from '../actions/post';
+
 export const initialState = {
   mainPosts: [
     {
@@ -31,12 +33,9 @@ export const initialState = {
     },
   ],
   imagePaths: [],
-  postAdded: false,
-};
-
-const ADD_POST = 'ADD_POST';
-export const addPost = {
-  type: ADD_POST,
+  addPostLoading: false,
+  addPostDone: false,
+  addPostError: null,
 };
 
 const dummyPost = {
@@ -50,13 +49,56 @@ const dummyPost = {
   Comments: [],
 };
 
+export const addPost = (data) => ({
+  type: ADD_POST.request,
+  data,
+});
+
+export const addComment = (data) => ({
+  type: ADD_COMMENT.request,
+  data,
+});
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case ADD_POST:
+    case ADD_POST.request:
+      return {
+        ...state,
+        addPostLoading: true,
+        addPostDone: false,
+        addPostError: null,
+      };
+    case ADD_POST.success:
       return {
         ...state,
         mainPosts: [dummyPost, ...state.mainPosts],
-        postAdded: true,
+        addPostLoading: false,
+        addPostDone: true,
+      };
+    case ADD_POST.failure:
+      return {
+        ...state,
+        addPostLoading: false,
+        addPostError: action.error,
+      };
+    case ADD_COMMENT.request:
+      return {
+        ...state,
+        addCommentLoading: true,
+        addCommentDone: false,
+        addCommentError: null,
+      };
+    case ADD_COMMENT.success:
+      return {
+        ...state,
+        addCommentLoading: false,
+        addCommentDone: true,
+      };
+    case ADD_COMMENT.failure:
+      return {
+        ...state,
+        addCommentLoading: false,
+        addCommentError: action.error,
       };
     default:
       return state;
