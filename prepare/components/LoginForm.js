@@ -16,12 +16,12 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const { isLoggingIn } = useSelector((state) => state.user);
-  const [id, setId] = useState('');
+  const { logInLoading } = useSelector((state) => state.user);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const onChangeId = useCallback((e) => {
-    setId(e.target.value);
+  const onChangeEmail = useCallback((e) => {
+    setEmail(e.target.value);
   }, []);
 
   const onChangePassword = useCallback((e) => {
@@ -29,20 +29,19 @@ const LoginForm = () => {
   }, []);
 
   const onSubmitForm = useCallback(() => {
-    console.log('test');
-    dispatch(loginRequestAction({ id, password }));
-  }, [id, password]);
+    dispatch(loginRequestAction({ email, password }));
+  }, [email, password]);
 
   return (
     <FormWrapper onFinish={onSubmitForm}>
       <div>
-        <label htmlFor='user-id'>아이디</label>
+        <label htmlFor='user-email'>이메일</label>
         <br />
         <Input
-          name='user-id'
-          type='text'
-          value={id}
-          onChange={onChangeId}
+          name='user-email'
+          type='email'
+          value={email}
+          onChange={onChangeEmail}
           required
         />
       </div>
@@ -58,7 +57,7 @@ const LoginForm = () => {
         />
       </div>
       <ButtonWrapper>
-        <Button type='primary' htmlType='submit' loading={isLoggingIn}>
+        <Button type='primary' htmlType='submit' loading={logInLoading}>
           로그인
         </Button>
         <Link href='/signup'>
