@@ -1,17 +1,21 @@
 import React, { useCallback, useState } from 'react';
-import { Form, Input, Checkbox, Button } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
 import Head from 'next/head';
+import { Form, Input, Checkbox, Button } from 'antd';
 import styled from 'styled-components';
 
 import AppLayout from '../components/AppLayout';
 import useInput from '../hooks/useInput';
+import { SIGN_UP } from '../actions/user';
 
 const ErrorMessage = styled.div`
   color: red;
 `;
 
 const Signup = () => {
-  const [id, onChangeId] = useInput('');
+  const dispatch = useDispatch();
+  const { signUpLoading } = useSelector((state) => state.user);
+  const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
   const [password, onChangePassword] = useInput('');
 
@@ -28,15 +32,21 @@ const Signup = () => {
   const [term, setTerm] = useState('');
   const [termError, setTermError] = useState(false);
   const onChangeTerm = useCallback((e) => {
-    console.log(e.target.checked);
     setTerm(e.target.checked);
     setTermError(false);
   }, []);
 
   const onSubmitForm = useCallback(() => {
-    console.log(id, nickname, password, passwordCheck, term);
-    if (password !== passwordCheck) return setPasswordError(true);
-    if (!term) return setTermError(true);
+    if (password !== passwordCheck) {
+      return setPasswordError(true);
+    }
+    if (!term) {
+      return setTermError(true);
+    }
+    dispatch({
+      type: SIGN_UP.request,
+      data: { email, password, nickname },
+    });
   }, [password, passwordCheck, term]);
 
   return (
@@ -46,9 +56,15 @@ const Signup = () => {
       </Head>
       <Form onFinish={onSubmitForm}>
         <div>
-          <label htmlFor='user-id'>아이디</label>
+          <label htmlFor='user-email'>이메일</label>
           <br />
-          <Input name='user-id' value={id} required onChange={onChangeId} />
+          <Input
+            name='user-email'
+            type='email'
+            value={email}
+            required
+            onChange={onChangeEmail}
+          />
         </div>
         <div>
           <label htmlFor='user-nickname'>닉네임</label>
@@ -92,7 +108,7 @@ const Signup = () => {
           {termError && <ErrorMessage>약관에 동의하셔야 합니다.</ErrorMessage>}
         </div>
         <div style={{ marginTop: 10 }}>
-          <Button type='primary' htmlType='submit'>
+          <Button type='primary' htmlType='submit' loading={signUpLoading}>
             가입하기
           </Button>
         </div>
