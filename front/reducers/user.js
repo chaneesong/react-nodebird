@@ -1,15 +1,25 @@
-import { LOG_IN, LOG_OUT, SIGN_UP, FOLLOW, UNFOLLOW } from '../actions/user';
+import {
+  LOG_IN,
+  LOG_OUT,
+  SIGN_UP,
+  FOLLOW,
+  UNFOLLOW,
+  CHANGE_NICKNAME,
+} from '../actions/user';
 
 export const initialState = {
   logInLoading: false,
   logInDone: false,
-  LogInError: false,
+  LogInError: null,
   logOutLoading: false,
   logOutDone: false,
-  LogOutError: false,
+  LogOutError: null,
   signUpLoading: false,
   signUpDone: false,
-  signUpError: false,
+  signUpError: null,
+  changeNicknameLoading: false,
+  changeNicknameDone: false,
+  changeNicknameError: null,
   me: null,
   signUpdata: {},
   loginData: {},
@@ -97,6 +107,25 @@ const reducer = (state = initialState, action) => {
         ...state,
         signUpLoading: false,
         signUpError: action.error,
+      };
+    case CHANGE_NICKNAME.request:
+      return {
+        ...state,
+        changeNicknameLoading: true,
+        changeNicknameDone: false,
+        changeNicknameError: null,
+      };
+    case CHANGE_NICKNAME.success:
+      return {
+        ...state,
+        changeNicknameLoading: false,
+        changeNicknameDone: false,
+      };
+    case CHANGE_NICKNAME.failure:
+      return {
+        ...state,
+        changeNicknameLoading: false,
+        changeNicknameError: action.error,
       };
     default:
       return state;
