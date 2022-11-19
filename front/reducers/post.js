@@ -1,11 +1,11 @@
 import { generate } from 'shortid';
 
-import { ADD_POST, ADD_COMMENT } from '../actions/post';
+import { ADD_POST, ADD_COMMENT, REMOVE_POST } from '../actions/post';
 
 export const initialState = {
   mainPosts: [
     {
-      id: 1,
+      id: generate(),
       User: {
         id: 1,
         nickname: 'song',
@@ -38,15 +38,19 @@ export const initialState = {
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
+  removePostLoading: false,
+  removePostDone: false,
+  removePostError: null,
   addCommentLoading: false,
   addCommentDone: false,
   addCommentError: null,
 };
 
 const dummyPost = (data) => ({
-  id: generate(),
-  content: data,
+  id: data.id,
+  content: data.content,
   User: {
+    id: 1,
     email: 'test@test.com',
     nickname: 'gigo96',
   },
@@ -90,6 +94,26 @@ const reducer = (state = initialState, action) => {
         addPostDone: true,
       };
     case ADD_POST.failure:
+      return {
+        ...state,
+        removePostLoading: false,
+        removePostError: action.error,
+      };
+    case REMOVE_POST.request:
+      return {
+        ...state,
+        removePostLoading: true,
+        removePostDone: false,
+        removePostError: null,
+      };
+    case REMOVE_POST.success:
+      return {
+        ...state,
+        mainPosts: state.mainPosts.filter((v) => v.id !== action.data),
+        removePostLoading: false,
+        removePostDone: true,
+      };
+    case REMOVE_POST.failure:
       return {
         ...state,
         addPostLoading: false,
