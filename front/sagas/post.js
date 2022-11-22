@@ -1,20 +1,26 @@
 import { all, fork, takeLatest, put, delay, call } from 'redux-saga/effects';
 import axios from 'axios';
-import shortId from 'shortid';
+import { faker } from '@faker-js/faker';
 
-import { ADD_POST, ADD_COMMENT, REMOVE_POST } from '../actions/post';
+import {
+  ADD_POST,
+  ADD_COMMENT,
+  REMOVE_POST,
+  LOAD_POSTS,
+} from '../actions/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
+import { generateDummyPost } from '../reducers/post';
 
-function addPostAPI() {
-  return axios.post('/api/post');
+function addPostAPI(data) {
+  return axios.post('/api/post', data);
 }
 
 function* addPost(action) {
   try {
     yield delay(1000);
-    // const result = yield call(addPostAPI);
+    // const result = yield call(addPostAPI, action.data);
 
-    const id = shortId.generate();
+    const id = faker.data.uuid();
     yield put({
       type: ADD_POST.success,
       data: {
@@ -29,6 +35,26 @@ function* addPost(action) {
   } catch (error) {
     yield put({
       type: ADD_POST.failure,
+      data: error.response.data,
+    });
+  }
+}
+
+function loadPostAPI() {
+  return axios.get('/api/posts');
+}
+
+function* loadPost(action) {
+  try {
+    yield delay(1000);
+    // const result = yield call(addPostAPI);
+    yield put({
+      type: LOAD_POSTS.success,
+      data: generateDummyPost(10),
+    });
+  } catch (error) {
+    yield put({
+      type: LOAD_POSTS.failure,
       data: error.response.data,
     });
   }
@@ -84,6 +110,10 @@ function* watchAddPost() {
   yield takeLatest(ADD_POST.request, addPost);
 }
 
+function* watchLoadPost() {
+  yield takeLatest(LOAD_POSTS.request, loadPost);
+}
+
 function* watchRemovePost() {
   yield takeLatest(REMOVE_POST.request, removePost);
 }
@@ -93,5 +123,10 @@ function* watchAddComment() {
 }
 
 export default function* postSaga() {
-  yield all([fork(watchAddPost), fork(watchRemovePost), fork(watchAddComment)]);
+  yield all([
+    fork(watchLoadPost),
+    fork(watchAddPost),
+    fork(watchRemovePost),
+    fork(watchAddComment),
+  ]);
 }
