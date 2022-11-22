@@ -1,41 +1,20 @@
-import { generate } from 'shortid';
 import produce from 'immer';
+import { faker } from '@faker-js/faker';
 
-import { ADD_POST, ADD_COMMENT, REMOVE_POST } from '../actions/post';
+import {
+  ADD_POST,
+  ADD_COMMENT,
+  REMOVE_POST,
+  LOAD_POSTS,
+} from '../actions/post';
 
 export const initialState = {
-  mainPosts: [
-    {
-      id: generate(),
-      User: {
-        id: 1,
-        nickname: 'song',
-      },
-      content: 'first post #hashtag #express',
-      Images: [
-        {
-          src: 'https://noticon-static.tammolo.com/dgggcrkxq/image/upload/v1566557331/noticon/d5hqar2idkoefh6fjtpu.png',
-        },
-        {
-          src: 'https://noticon-static.tammolo.com/dgggcrkxq/image/upload/v1567008394/noticon/ohybolu4ensol1gzqas1.png',
-        },
-        {
-          src: 'https://noticon-static.tammolo.com/dgggcrkxq/image/upload/v1667528160/noticon/jkteb0zahggo46okznlh.png',
-        },
-      ],
-      Comments: [
-        {
-          User: { nickname: 'kim' },
-          content: 'first comment',
-        },
-        {
-          User: { nickname: 'test' },
-          content: 'second comment',
-        },
-      ],
-    },
-  ],
+  mainPosts: [],
   imagePaths: [],
+  hasMorePosts: true,
+  loadPostsLoading: false,
+  loadPostsDone: false,
+  loadPostsError: null,
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
@@ -46,6 +25,35 @@ export const initialState = {
   addCommentDone: false,
   addCommentError: null,
 };
+
+faker.seed(1234);
+export const generateDummyPost = (number) =>
+  Array(number)
+    .fill()
+    .map(() => ({
+      id: faker.datatype.uuid(),
+      User: {
+        id: faker.datatype.uuid(),
+        nickname: faker.internet.userName(),
+      },
+      content: faker.lorem.paragraph(),
+      Images: [
+        {
+          src: faker.image.image(640, 480, true),
+        },
+      ],
+      Comments: [
+        {
+          User: {
+            id: faker.datatype.uuid(),
+            nickname: faker.internet.userName(),
+          },
+          content: faker.lorem.sentence(),
+        },
+      ],
+    }));
+
+initialState.mainPosts = initialState.mainPosts.concat(generateDummyPost(10));
 
 const dummyPost = (data) => ({
   id: data.id,
@@ -60,7 +68,7 @@ const dummyPost = (data) => ({
 });
 
 const dummyComment = (data) => ({
-  id: generate(),
+  id: faker.data.uuid(),
   content: data,
   User: {
     id: 1,
@@ -81,6 +89,21 @@ export const addComment = (data) => ({
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
     switch (action.type) {
+      case LOAD_POSTS.request:
+        draft.loadPostsLoading = true;
+        draft.loadPostsDone = false;
+        draft.loadPostsError = null;
+        break;
+      case LOAD_POSTS.success:
+        draft.loadPostsLoading = false;
+        draft.loadPostsDone = true;
+        draft.mainPosts = action.data.concat(draft.mainPosts);
+        draft.hasMorePosts = draft.mainPosts.length < 50;
+        break;
+      case LOAD_POSTS.failure:
+        draft.loadPostsLoading = false;
+        draft.loadPostsError = action.error;
+        break;
       case ADD_POST.request:
         draft.addPostLoading = true;
         draft.addPostDone = false;
