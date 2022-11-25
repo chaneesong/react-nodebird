@@ -10,7 +10,11 @@ const isDev = process.env.NODE_ENV === 'development';
 
 const createStore = () => {
   const sagaMiddleware = createSagaMiddleware();
-  const middlewares = [sagaMiddleware, logger];
+  const middlewares = [sagaMiddleware];
+
+  if (isDev) {
+    middlewares.push(logger);
+  }
 
   const store = configureStore({
     reducer: rootReducer,
