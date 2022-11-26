@@ -1,18 +1,19 @@
 'use strict';
 
-const Sequelize = require('sequelize');
+import Sequelize from 'sequelize';
 
-const config = require('../config/config')[env];
-const User = require('./user');
+import config from '../config/config';
+import User from './user';
 
 const env = process.env.NODE_ENV || 'development';
 const db = {};
 
+const sequelizeConfig = config[env];
 const sequelize = new Sequelize(
-  config.database,
-  config.username,
-  config.password,
-  config
+  sequelizeConfig.database,
+  sequelizeConfig.username,
+  sequelizeConfig.password,
+  sequelizeConfig
 );
 
 db.sequelize = sequelize;
