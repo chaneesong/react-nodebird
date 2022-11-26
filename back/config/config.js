@@ -4,9 +4,9 @@ dotenv.config();
 
 const config = {
   development: {
-    username: 'root',
-    password: DEVELOPMENT_DATABASE_PASSWORD,
-    database: 'react-nodebird',
+    username: process.env.SEQUELIZE_USERNAME,
+    password: process.env.SEQUELIZE_PASSWORD,
+    database: process.env.SEQUELIZE_DATABASE,
     host: '127.0.0.1',
     dialect: 'mysql',
   },
