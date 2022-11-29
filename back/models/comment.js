@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 
-class Post extends Sequelize.Model {
+class Comment extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
@@ -13,8 +13,8 @@ class Post extends Sequelize.Model {
         sequelize,
         timestamps: true,
         underscored: false,
-        modelName: 'Post',
-        tableName: 'posts',
+        modelName: 'Comment',
+        tableName: 'comments',
         paranoid: true,
         charset: 'utf8mb4',
         collate: 'utf8mb4_general_ci',
@@ -23,9 +23,9 @@ class Post extends Sequelize.Model {
   }
 
   static associate(db) {
-    db.Post.belongsTo(db.User);
-    db.Post.hasMany(db.Comment);
+    db.Comment.belongsTo(db.User);
+    db.Comment.belongsTo(db.Post);
   }
 }
 
-export default Post;
+export default Comment;
