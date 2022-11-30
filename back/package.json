@@ -1,10 +1,10 @@
 {
-  "name": "back",
+  "name": "react-nodebird-back",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app"
+    "dev": "nodemon --es-module-specifier-resolution=node app"
   },
   "type": "module",
   "keywords": [],
@@ -16,5 +16,8 @@
     "mysql2": "^2.3.3",
     "sequelize": "^6.25.8",
     "sequelize-cli": "^6.5.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
