@@ -2,7 +2,7 @@
 
 import Sequelize from 'sequelize';
 
-import config from '../config/config';
+import config from '../config/config.js';
 import User from './user';
 import Post from './post';
 import Comment from './comment';
@@ -22,6 +22,10 @@ const sequelize = new Sequelize(
 
 db.sequelize = sequelize;
 db.User = User;
+db.Post = Post;
+db.Comment = Comment;
+db.Image = Image;
+db.Hashtag = Hashtag;
 
 User.init(sequelize);
 Post.init(sequelize);
@@ -35,4 +39,5 @@ Comment.associate(db);
 Image.associate(db);
 Hashtag.associate(db);
 
+export { sequelize, User, Post, Comment, Image, Hashtag };
 export default db;
