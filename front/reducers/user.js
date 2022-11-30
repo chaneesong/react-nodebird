@@ -132,6 +132,11 @@ const reducer = (state = initialState, action) =>
         draft.signUpLoading = false;
         draft.signUpError = action.error;
         break;
+      case SIGN_UP.clear:
+        draft.signUpLoading = false;
+        draft.signUpDone = false;
+        draft.signUpError = null;
+        break;
       case CHANGE_NICKNAME.request:
         draft.changeNicknameLoading = true;
         draft.changeNicknameDone = false;
