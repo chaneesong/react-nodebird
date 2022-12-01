@@ -4,7 +4,7 @@ import axios from 'axios';
 import { LOG_IN, LOG_OUT, SIGN_UP, FOLLOW, UNFOLLOW } from '../actions/user';
 
 function logInAPI(data) {
-  return axios.post('http://localhost:3065/user', data);
+  return axios.post('/user/login', data);
 }
 
 function* logIn(action) {
@@ -12,7 +12,7 @@ function* logIn(action) {
     const result = yield call(logInAPI, action.data);
     yield put({
       type: LOG_IN.success,
-      data: action.data,
+      data: result.data,
     });
   } catch (error) {
     yield put({
@@ -23,7 +23,7 @@ function* logIn(action) {
 }
 
 function logOutAPI() {
-  return axios.post('http://localhost:3065/logout');
+  return axios.post('/user/logout');
 }
 
 function* logOut(action) {
@@ -42,7 +42,7 @@ function* logOut(action) {
 }
 
 function signUpAPI(data) {
-  return axios.post('http://localhost:3065/user', data);
+  return axios.post('/user', data);
 }
 
 function* signUp(action) {
@@ -62,13 +62,12 @@ function* signUp(action) {
 }
 
 function followAPI() {
-  return axios.post('/api/follow');
+  return axios.post('/user/follow');
 }
 
 function* follow(action) {
   try {
-    // const result = yield call(logOutAPI);
-    yield delay(1000);
+    const result = yield call(logOutAPI);
     yield put({
       type: FOLLOW.success,
       data: action.data,
@@ -82,13 +81,12 @@ function* follow(action) {
 }
 
 function unFollowAPI() {
-  return axios.post('/api/unfollow');
+  return axios.post('/user/unfollow');
 }
 
 function* unFollow(action) {
   try {
-    // const result = yield call(logOutAPI);
-    yield delay(1000);
+    const result = yield call(logOutAPI);
     yield put({
       type: UNFOLLOW.success,
       data: action.data,

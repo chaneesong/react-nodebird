@@ -99,7 +99,7 @@ const reducer = (state = initialState, action) =>
       case LOG_IN.success:
         draft.logInLoading = false;
         draft.logInDone = true;
-        draft.me = dummyUser(action.data);
+        draft.me = action.data;
         break;
       case LOG_IN.failure:
         draft.logInLoading = false;
