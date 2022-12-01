@@ -1,11 +1,13 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
+import passport from 'passport';
 
-import { User } from '../models/index.js';
+import { User, Post } from '../models/index.js';
+import { isLoggedIn, isNotLoggedIn } from './middlewares.js';
 
 const router = express.Router();
 
-router.post('/', async (req, res, next) => {
+router.post('/', isNotLoggedIn, async (req, res, next) => {
   try {
     const exUser = await User.findOne({
       where: {
@@ -26,6 +28,55 @@ router.post('/', async (req, res, next) => {
     console.error(error);
     next(error);
   }
+});
+
+router.post('/login', isNotLoggedIn, (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      console.error(err);
+      return next(err);
+    }
+    if (info) {
+      return res.status(401).send(info.reason);
+    }
+    return req.login(user, async (loginErr) => {
+      if (loginErr) {
+        console.error(loginErr);
+        return next(loginErr);
+      }
+      const fullUserWithoutPassword = await User.findOne({
+        where: { id: user.id },
+        attributes: {
+          exclude: ['password'],
+        },
+        include: [
+          {
+            model: Post,
+          },
+          {
+            model: User,
+            as: 'Followings',
+          },
+          {
+            model: User,
+            as: 'Followers',
+          },
+        ],
+      });
+      return res.status(200).json(fullUserWithoutPassword);
+    });
+  })(req, res, next);
+});
+
+router.post('/logout', isLoggedIn, (req, res, next) => {
+  req.logout((err) => {
+    req.session.destroy();
+    if (err) {
+      console.error(err);
+      return next(err);
+    }
+    res.status(200).send('ok');
+  });
 });
 
 export default router;
