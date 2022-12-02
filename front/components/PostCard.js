@@ -109,7 +109,7 @@ PostCard.propTypes = {
     id: PropTypes.string, // 더미데이터에서는 스트링으로 받고 실제로는 정수로 받음
     User: PropTypes.object,
     content: PropTypes.string,
-    createdAt: PropTypes.object,
+    createdAt: PropTypes.string,
     Comments: PropTypes.arrayOf(PropTypes.object),
     Images: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
