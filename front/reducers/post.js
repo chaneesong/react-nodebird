@@ -1,5 +1,4 @@
 import produce from 'immer';
-import { faker } from '@faker-js/faker';
 
 import {
   ADD_POST,
@@ -25,56 +24,6 @@ export const initialState = {
   addCommentDone: false,
   addCommentError: null,
 };
-
-faker.seed(1234);
-export const generateDummyPost = (number) =>
-  Array(number)
-    .fill()
-    .map(() => ({
-      id: faker.datatype.uuid(),
-      User: {
-        id: faker.datatype.uuid(),
-        nickname: faker.internet.userName(),
-      },
-      content: faker.lorem.paragraph(),
-      Images: [
-        {
-          src: faker.image.image(640, 480, true),
-        },
-      ],
-      Comments: [
-        {
-          User: {
-            id: faker.datatype.uuid(),
-            nickname: faker.internet.userName(),
-          },
-          content: faker.lorem.sentence(),
-        },
-      ],
-    }));
-
-initialState.mainPosts = initialState.mainPosts.concat(generateDummyPost(10));
-
-const dummyPost = (data) => ({
-  id: data.id,
-  content: data.content,
-  User: {
-    id: 1,
-    email: 'test@test.com',
-    nickname: 'gigo96',
-  },
-  Images: [],
-  Comments: [],
-});
-
-const dummyComment = (data) => ({
-  id: faker.data.uuid(),
-  content: data,
-  User: {
-    id: 1,
-    nickname: 'gigo96',
-  },
-});
 
 export const addPost = (data) => ({
   type: ADD_POST.request,
@@ -110,7 +59,7 @@ const reducer = (state = initialState, action) => {
         draft.addPostError = null;
         break;
       case ADD_POST.success:
-        draft.mainPosts.unshift(dummyPost(action.data));
+        draft.mainPosts.unshift(action.data);
         draft.addPostLoading = false;
         draft.addPostDone = true;
         break;
@@ -138,8 +87,9 @@ const reducer = (state = initialState, action) => {
         draft.addCommentError = null;
         break;
       case ADD_COMMENT.success: {
-        const post = draft.mainPosts.find((v) => v.id === action.data.postId);
-        post.Comments.unshift(dummyComment(action.data.content));
+        console.log('post data', action.data);
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+        post.Comments.unshift(action.data);
         draft.addCommentLoading = false;
         draft.addCommentDone = true;
         break;

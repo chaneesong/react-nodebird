@@ -7,9 +7,13 @@ import {
   FOLLOW,
   UNFOLLOW,
   CHANGE_NICKNAME,
+  LOAD_MY_INFO,
 } from '../actions/user';
 
 export const initialState = {
+  loadMyInfoLoading: false,
+  loadMyInfoDone: false,
+  loadMyInfoError: null,
   logInLoading: false,
   logInDone: false,
   logInError: null,
@@ -61,6 +65,20 @@ export const logoutRequestAction = (data) => {
 const reducer = (state = initialState, action) =>
   produce(state, (draft) => {
     switch (action.type) {
+      case LOAD_MY_INFO.request:
+        draft.loadMyInfoLoading = true;
+        draft.loadMyInfoDone = false;
+        draft.loadMyInfoError = null;
+        break;
+      case LOAD_MY_INFO.success:
+        draft.loadMyInfoLoading = false;
+        draft.loadMyInfoDone = true;
+        draft.me = action.data;
+        break;
+      case LOAD_MY_INFO.failure:
+        draft.loadMyInfoLoading = false;
+        draft.loadMyInfoError = action.error;
+        break;
       case FOLLOW.request:
         draft.followLoading = true;
         draft.followDone = false;
