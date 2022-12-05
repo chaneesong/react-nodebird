@@ -5,6 +5,8 @@ import {
   ADD_COMMENT,
   REMOVE_POST,
   LOAD_POSTS,
+  LIKE_POST,
+  UNLIKE_POST,
 } from '../actions/post';
 
 export const initialState = {
@@ -23,6 +25,12 @@ export const initialState = {
   addCommentLoading: false,
   addCommentDone: false,
   addCommentError: null,
+  likePostLoading: false,
+  likePostDone: false,
+  likePostError: null,
+  unlikePostLoading: false,
+  unlikePostDone: false,
+  unlikePostError: null,
 };
 
 export const addPost = (data) => ({
@@ -87,7 +95,6 @@ const reducer = (state = initialState, action) => {
         draft.addCommentError = null;
         break;
       case ADD_COMMENT.success: {
-        console.log('post data', action.data);
         const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
         post.Comments.unshift(action.data);
         draft.addCommentLoading = false;
@@ -97,6 +104,36 @@ const reducer = (state = initialState, action) => {
       case ADD_COMMENT.failure:
         draft.addCommentLoading = false;
         draft.addCommentError = action.error;
+      case LIKE_POST.request:
+        draft.likePostLoading = true;
+        draft.likePostDone = false;
+        draft.likePostError = null;
+        break;
+      case LIKE_POST.success: {
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+        post.Likers.push({ id: action.data.UserId });
+        draft.likePostLoading = false;
+        draft.likePostDone = true;
+        break;
+      }
+      case LIKE_POST.failure:
+        draft.likePostLoading = false;
+        draft.likePostError = action.error;
+      case UNLIKE_POST.request:
+        draft.unlikePostLoading = true;
+        draft.unlikePostDone = false;
+        draft.unlikePostError = null;
+        break;
+      case UNLIKE_POST.success: {
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+        post.Likers = post.Likers.filter((v) => v.id !== action.data.UserId);
+        draft.unlikePostLoading = false;
+        draft.unlikePostDone = true;
+        break;
+      }
+      case UNLIKE_POST.failure:
+        draft.unlikePostLoading = false;
+        draft.unlikePostError = action.error;
       default:
         break;
     }

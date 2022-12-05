@@ -14,16 +14,26 @@ import PostImages from '../components/PostImages';
 import CommentForm from './CommentForm';
 import PostCardContent from './PostCardContent';
 import FollowButton from './FollowButton';
-import { REMOVE_POST } from '../actions/post';
+import { LIKE_POST, REMOVE_POST, UNLIKE_POST } from '../actions/post';
 
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
   const id = useSelector((state) => state.user.me?.id);
-  const [liked, setLiked] = useState(false);
+  const liked = post.Likers.find((v) => v.id === id);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
 
-  const onToggleLike = useCallback(() => {
-    setLiked((prev) => !prev);
+  const onLike = useCallback(() => {
+    dispatch({
+      type: LIKE_POST.request,
+      data: post.id,
+    });
+  }, []);
+
+  const onUnlike = useCallback(() => {
+    dispatch({
+      type: UNLIKE_POST.request,
+      data: post.id,
+    });
   }, []);
 
   const onToggleComment = useCallback(() => {
@@ -47,10 +57,10 @@ const PostCard = ({ post }) => {
             <HeartTwoTone
               twoToneColor='#eb2f96'
               key='heart'
-              onClick={onToggleLike}
+              onClick={onUnlike}
             />
           ) : (
-            <HeartOutlined key='heart' onClick={onToggleLike} />
+            <HeartOutlined key='heart' onClick={onLike} />
           ),
           <MessageOutlined key='comment' onClick={onToggleComment} />,
           <Popover
@@ -106,12 +116,13 @@ const PostCard = ({ post }) => {
 
 PostCard.propTypes = {
   post: PropTypes.shape({
-    id: PropTypes.string, // 더미데이터에서는 스트링으로 받고 실제로는 정수로 받음
+    id: PropTypes.number,
     User: PropTypes.object,
     content: PropTypes.string,
     createdAt: PropTypes.string,
     Comments: PropTypes.arrayOf(PropTypes.object),
     Images: PropTypes.arrayOf(PropTypes.object),
+    Likers: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
 };
 

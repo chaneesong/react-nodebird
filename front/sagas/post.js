@@ -6,8 +6,29 @@ import {
   ADD_COMMENT,
   REMOVE_POST,
   LOAD_POSTS,
+  LIKE_POST,
+  UNLIKE_POST,
 } from '../actions/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
+
+function loadPostAPI() {
+  return axios.get('/posts');
+}
+
+function* loadPost() {
+  try {
+    const result = yield call(loadPostAPI);
+    yield put({
+      type: LOAD_POSTS.success,
+      data: result.data,
+    });
+  } catch (error) {
+    yield put({
+      type: LOAD_POSTS.failure,
+      data: error.response.data,
+    });
+  }
+}
 
 function addPostAPI(data) {
   return axios.post('/post', { content: data });
@@ -33,42 +54,22 @@ function* addPost(action) {
   }
 }
 
-function loadPostAPI() {
-  return axios.get('/posts');
-}
-
-function* loadPost() {
-  try {
-    const result = yield call(loadPostAPI);
-    console.log('loadPost', result.data);
-    yield put({
-      type: LOAD_POSTS.success,
-      data: result.data,
-    });
-  } catch (error) {
-    yield put({
-      type: LOAD_POSTS.failure,
-      data: error.response.data,
-    });
-  }
-}
-
 function removePostAPI() {
   return axios.delete('/api/post');
 }
 
-function* removePost(action) {
+function* removePost() {
   try {
     yield delay(1000);
-    // const result = yield call(removePost);
+    const result = yield call(removePostAPI);
 
     yield put({
       type: REMOVE_POST.success,
-      data: action.data,
+      data: result.data,
     });
     yield put({
       type: REMOVE_POST_OF_ME,
-      data: action.data,
+      data: result.data,
     });
   } catch (error) {
     yield put({
@@ -98,12 +99,52 @@ function* addComment(action) {
   }
 }
 
-function* watchAddPost() {
-  yield takeLatest(ADD_POST.request, addPost);
+function likePostAPI(postId) {
+  return axios.patch(`/post/${postId}/like`);
+}
+
+function* likePost(action) {
+  try {
+    const result = yield call(likePostAPI, action.data);
+    yield put({
+      type: LIKE_POST.success,
+      data: result.data,
+    });
+  } catch (error) {
+    console.error(error);
+    yield put({
+      type: LIKE_POST.failure,
+      data: error.response.data,
+    });
+  }
+}
+
+function unlikePostAPI(postId) {
+  return axios.patch(`/post/${postId}/unlike`);
+}
+
+function* unlikePost(action) {
+  try {
+    const result = yield call(unlikePostAPI, action.data);
+    yield put({
+      type: UNLIKE_POST.success,
+      data: result.data,
+    });
+  } catch (error) {
+    console.error(error);
+    yield put({
+      type: UNLIKE_POST.failure,
+      data: error.response.data,
+    });
+  }
 }
 
 function* watchLoadPost() {
   yield takeLatest(LOAD_POSTS.request, loadPost);
+}
+
+function* watchAddPost() {
+  yield takeLatest(ADD_POST.request, addPost);
 }
 
 function* watchRemovePost() {
@@ -114,11 +155,21 @@ function* watchAddComment() {
   yield takeLatest(ADD_COMMENT.request, addComment);
 }
 
+function* watchLikePost() {
+  yield takeLatest(LIKE_POST.request, likePost);
+}
+
+function* watchUnlikePost() {
+  yield takeLatest(UNLIKE_POST.request, unlikePost);
+}
+
 export default function* postSaga() {
   yield all([
     fork(watchLoadPost),
     fork(watchAddPost),
     fork(watchRemovePost),
     fork(watchAddComment),
+    fork(watchLikePost),
+    fork(watchUnlikePost),
   ]);
 }
