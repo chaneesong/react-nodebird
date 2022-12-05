@@ -37,15 +37,6 @@ export const initialState = {
   loginData: {},
 };
 
-const dummyUser = (data) => ({
-  ...data,
-  nickname: 'gigo96',
-  id: 1,
-  Posts: [{ id: 1 }],
-  Followings: [{ nickname: 'test1' }, { nickname: 'test2' }],
-  Followers: [{ nickname: 'test1' }],
-});
-
 export const ADD_POST_TO_ME = 'ADD_POST_TO_ME';
 export const REMOVE_POST_OF_ME = 'REMOVE_POST_OF_ME';
 
