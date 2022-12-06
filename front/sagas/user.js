@@ -8,6 +8,7 @@ import {
   FOLLOW,
   UNFOLLOW,
   LOAD_MY_INFO,
+  CHANGE_NICKNAME,
 } from '../actions/user';
 
 function loadMyInfoAPI() {
@@ -125,6 +126,25 @@ function* unFollow(action) {
   }
 }
 
+function changeNicknameAPI(data) {
+  return axios.patch('/user/nickname', { nickname: data });
+}
+
+function* changeNickname(action) {
+  try {
+    const result = yield call(changeNicknameAPI, action.data);
+    yield put({
+      type: CHANGE_NICKNAME.success,
+      data: result.data,
+    });
+  } catch (error) {
+    yield put({
+      type: CHANGE_NICKNAME.failure,
+      error: error.response.data,
+    });
+  }
+}
+
 function* watchLoadMyInfo() {
   yield takeLatest(LOAD_MY_INFO.request, loadMyInfo);
 }
@@ -140,11 +160,17 @@ function* watchLogOut() {
 function* watchSignUp() {
   yield takeLatest(SIGN_UP.request, signUp);
 }
+
 function* watchFollow() {
   yield takeLatest(FOLLOW.request, follow);
 }
+
 function* watchUnfollow() {
   yield takeLatest(UNFOLLOW.request, unFollow);
+}
+
+function* watchChangeNickname() {
+  yield takeLatest(CHANGE_NICKNAME.request, changeNickname);
 }
 
 export default function* userSaga() {
@@ -155,5 +181,6 @@ export default function* userSaga() {
     fork(watchLogIn),
     fork(watchLogOut),
     fork(watchSignUp),
+    fork(watchChangeNickname),
   ]);
 }
