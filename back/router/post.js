@@ -71,7 +71,7 @@ router.post(
 router.patch('/:postId/like', isLoggedIn, findPost, async (req, res, next) => {
   try {
     const post = res.locals.post;
-    await req.post.addLikers(req.user.id);
+    await post.addLikers(req.user.id);
     res.json({ PostId: post.id, UserId: req.user.id });
   } catch (error) {
     console.error(error);
@@ -94,5 +94,18 @@ router.patch(
     }
   }
 );
+
+router.delete('/:postId', isLoggedIn, findPost, async (req, res, next) => {
+  try {
+    console.log(req.params.id, req.user.id);
+    await Post.destroy({
+      where: { id: req.params.postId, UserId: req.user.id },
+    });
+    res.json({ PostId: parseInt(req.params.postId, 10) });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
 
 export default router;
