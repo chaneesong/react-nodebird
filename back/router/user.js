@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import passport from 'passport';
 
 import { User, Post } from '../models/index.js';
-import { isLoggedIn, isNotLoggedIn } from './middlewares.js';
+import { findUser, isLoggedIn, isNotLoggedIn } from './middlewares.js';
 
 const router = express.Router();
 
@@ -20,27 +20,78 @@ router.get('/', async (req, res, next) => {
       include: [
         {
           model: Post,
-          attributes: {
-            include: ['id'],
-          },
+          attributes: ['id'],
         },
         {
           model: User,
           as: 'Followings',
-          attributes: {
-            include: ['id'],
-          },
+          attributes: ['id'],
+          through: { attributes: [] },
         },
         {
           model: User,
           as: 'Followers',
-          attributes: {
-            include: ['id'],
-          },
+          attributes: ['id'],
+          through: { attributes: [] },
         },
       ],
     });
     return res.status(200).json(fullUserWithoutPassword);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.patch('/:userId/follow', findUser, async (req, res, next) => {
+  try {
+    const user = res.locals.user;
+    await user.addFollowers(req.user.id);
+    res.status(200).json({ userId: parseInt(req.params.userId, 10) });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.delete('/:userId/follow', findUser, async (req, res, next) => {
+  try {
+    const user = res.locals.user;
+    await user.removeFollowers(req.user.id);
+    return res.status(200).json({ userId: parseInt(req.params.userId, 10) });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.delete('/follower/:userId', findUser, async (req, res, next) => {
+  try {
+    const user = res.locals.user;
+    await user.removeFollowings(req.user.id);
+    return res.status(200).json({ userId: parseInt(req.params.userId, 10) });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.get('/followers', findUser, async (req, res, next) => {
+  try {
+    const user = res.locals.user;
+    const followers = await user.getFollowers();
+    res.status(200).json(followers);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.get('/followings', findUser, async (req, res, next) => {
+  try {
+    const user = res.locals.user;
+    const followings = await user.getFollowings();
+    res.status(200).json(followings);
   } catch (error) {
     console.error(error);
     next(error);
@@ -109,23 +160,19 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
         include: [
           {
             model: Post,
-            attributes: {
-              include: ['id'],
-            },
+            attributes: ['id'],
           },
           {
             model: User,
             as: 'Followings',
-            attributes: {
-              include: ['id'],
-            },
+            attributes: ['id'],
+            through: { attributes: [] },
           },
           {
             model: User,
             as: 'Followers',
-            attributes: {
-              include: ['id'],
-            },
+            attributes: ['id'],
+            through: { attributes: [] },
           },
         ],
       });

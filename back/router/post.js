@@ -86,7 +86,7 @@ router.patch(
   async (req, res, next) => {
     try {
       const post = res.locals.post;
-      await req.post.removeLikers(req.user.id);
+      await post.removeLikers(req.user.id);
       res.json({ PostId: post.id, UserId: req.user.id });
     } catch (error) {
       console.error(error);
