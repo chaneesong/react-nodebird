@@ -7,3 +7,6 @@ export const SIGN_UP = createAsyncActions('SIGN_UP');
 export const CHANGE_NICKNAME = createAsyncActions('CHANGE_NICKNAME');
 export const FOLLOW = createAsyncActions('FOLLOW');
 export const UNFOLLOW = createAsyncActions('UNFOLLOW');
+export const LOAD_FOLLOWERS = createAsyncActions('LOAD_FOLLOWERS');
+export const LOAD_FOLLOWINGS = createAsyncActions('LOAD_FOLLOWINGS');
+export const REMOVE_FOLLOWER = createAsyncActions('REMOVE_FOLLOWER');
