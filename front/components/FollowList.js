@@ -1,10 +1,26 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Card, List, Button } from 'antd';
 import { StopOutlined } from '@ant-design/icons';
+import { useDispatch } from 'react-redux';
+import { REMOVE_FOLLOWER, UNFOLLOW } from '../actions/user';
 
 const FollowList = ({ header, data }) => {
-  console.log(header, data);
+  const dispatch = useDispatch();
+
+  const onCancle = useCallback((id) => () => {
+    if (header === 'follow') {
+      dispatch({
+        type: UNFOLLOW.request,
+        data: id,
+      });
+    }
+    dispatch({
+      type: REMOVE_FOLLOWER.request,
+      data: id,
+    });
+  });
+
   return (
     <List
       style={{ marginBottom: '20px' }}
@@ -20,7 +36,9 @@ const FollowList = ({ header, data }) => {
       dataSource={data}
       renderItem={(item) => (
         <List.Item style={{ marginTop: '20px' }}>
-          <Card actions={[<StopOutlined key='stop' />]}>
+          <Card
+            actions={[<StopOutlined key='stop' onClick={onCancle(item.id)} />]}
+          >
             <Card.Meta description={item.nickname} />
           </Card>
         </List.Item>
