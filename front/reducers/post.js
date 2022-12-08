@@ -7,6 +7,8 @@ import {
   LOAD_POSTS,
   LIKE_POST,
   UNLIKE_POST,
+  UPLOAD_IMAGES,
+  REMOVE_IMAGE,
 } from '../actions/post';
 
 export const initialState = {
@@ -31,12 +33,10 @@ export const initialState = {
   unlikePostLoading: false,
   unlikePostDone: false,
   unlikePostError: null,
+  uploadImagesLoading: false,
+  uploadImagesDone: false,
+  uploadImagesError: null,
 };
-
-export const addPost = (data) => ({
-  type: ADD_POST.request,
-  data,
-});
 
 export const addComment = (data) => ({
   type: ADD_COMMENT.request,
@@ -136,6 +136,23 @@ const reducer = (state = initialState, action) => {
       case UNLIKE_POST.failure:
         draft.unlikePostLoading = false;
         draft.unlikePostError = action.error;
+      case UPLOAD_IMAGES.request:
+        draft.uploadImagesLoading = true;
+        draft.uploadImagesDone = false;
+        draft.uploadImagesError = null;
+        break;
+      case UPLOAD_IMAGES.success: {
+        draft.imagePaths = action.data;
+        draft.uploadImagesLoading = false;
+        draft.uploadImagesDone = true;
+        break;
+      }
+      case UPLOAD_IMAGES.failure:
+        draft.uploadImagesLoading = false;
+        draft.uploadImagesError = action.error;
+      case REMOVE_IMAGE:
+        draft.imagePaths = draft.imagePaths.filter((v, i) => i !== action.data);
+        break;
       default:
         break;
     }

@@ -4,3 +4,4 @@ export const createAsyncActions = (suffixOfActions) => ({
   failure: suffixOfActions + '_FAILURE',
   clear: suffixOfActions + '_CLEAR',
 });
+export const BACKEND = 'http://localhost:3065';

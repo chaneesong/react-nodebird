@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { PlusOutlined } from '@ant-design/icons';
 
 import ImagesZoom from './ImagesZoom';
+import { BACKEND } from '../utils/factory';
 
 const PostImages = ({ images }) => {
   const [showImagesZoom, setShowImagesZoom] = useState(false);
@@ -21,8 +22,8 @@ const PostImages = ({ images }) => {
         <img
           style={{ width: '50%', display: 'inline-block' }}
           role='presentation'
-          src={images[0].src}
-          alt={images[0].src}
+          src={`${BACKEND}/${images[0].name}`}
+          alt={`${BACKEND}/${images[0].name}`}
           onClick={onZoom}
         />
         {showImagesZoom && <ImagesZoom images={images} onClose={onClose} />}
@@ -35,15 +36,15 @@ const PostImages = ({ images }) => {
         <img
           style={{ width: '50%', display: 'inline-block' }}
           role='presentation'
-          src={images[0].src}
-          alt={images[0].src}
+          src={`${BACKEND}/${images[0].name}`}
+          alt={`${BACKEND}/${images[0].name}`}
           onClick={onZoom}
         />
         <img
           style={{ width: '50%', display: 'inline-block' }}
           role='presentation'
-          src={images[1].src}
-          alt={images[1].src}
+          src={`${BACKEND}/${images[1].name}`}
+          alt={`${BACKEND}/${images[1].name}`}
           onClick={onZoom}
         />
         {showImagesZoom && <ImagesZoom images={images} onClose={onClose} />}
@@ -56,8 +57,8 @@ const PostImages = ({ images }) => {
         <img
           style={{ width: '50%', display: 'inline-block' }}
           role='presentation'
-          src={images[0].src}
-          alt={images[0].src}
+          src={`${BACKEND}/${images[0].name}`}
+          alt={`${BACKEND}/${images[0].name}`}
           onClick={onZoom}
         />
         <div
