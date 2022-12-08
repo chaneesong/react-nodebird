@@ -11,6 +11,7 @@ import {
   ImageWrapper,
   Indicator,
 } from './styles';
+import { BACKEND } from '../../utils/factory';
 
 const ImagesZoom = ({ images, onClose }) => {
   const [CurrentSlide, setCurrentSlide] = useState(0);
@@ -33,8 +34,8 @@ const ImagesZoom = ({ images, onClose }) => {
             slidesToScroll={1}
           >
             {images.map((image) => (
-              <ImageWrapper key={image.src}>
-                <img src={image.src} alt={image.src} />
+              <ImageWrapper key={`${BACKEND}/${image.name}`}>
+                <img src={`${BACKEND}/${image.name}`} alt={image.name} />
               </ImageWrapper>
             ))}
           </Slick>

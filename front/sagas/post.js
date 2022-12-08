@@ -1,4 +1,4 @@
-import { all, fork, takeLatest, put, delay, call } from 'redux-saga/effects';
+import { all, fork, takeLatest, put, call } from 'redux-saga/effects';
 import axios from 'axios';
 
 import {
@@ -8,6 +8,7 @@ import {
   LOAD_POSTS,
   LIKE_POST,
   UNLIKE_POST,
+  UPLOAD_IMAGES,
 } from '../actions/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
 
@@ -31,7 +32,7 @@ function* loadPost() {
 }
 
 function addPostAPI(data) {
-  return axios.post('/post', { content: data });
+  return axios.post('/post', data);
 }
 
 function* addPost(action) {
@@ -139,6 +140,26 @@ function* unlikePost(action) {
   }
 }
 
+function uploadImagesAPI(images) {
+  return axios.post(`/post/images`, images);
+}
+
+function* uploadImages(action) {
+  try {
+    const result = yield call(uploadImagesAPI, action.data);
+    yield put({
+      type: UPLOAD_IMAGES.success,
+      data: result.data,
+    });
+  } catch (error) {
+    console.error(error);
+    yield put({
+      type: UPLOAD_IMAGES.failure,
+      data: error.response.data,
+    });
+  }
+}
+
 function* watchLoadPost() {
   yield takeLatest(LOAD_POSTS.request, loadPost);
 }
@@ -163,6 +184,10 @@ function* watchUnlikePost() {
   yield takeLatest(UNLIKE_POST.request, unlikePost);
 }
 
+function* watchUploadImages() {
+  yield takeLatest(UPLOAD_IMAGES.request, uploadImages);
+}
+
 export default function* postSaga() {
   yield all([
     fork(watchLoadPost),
@@ -171,5 +196,6 @@ export default function* postSaga() {
     fork(watchAddComment),
     fork(watchLikePost),
     fork(watchUnlikePost),
+    fork(watchUploadImages),
   ]);
 }
