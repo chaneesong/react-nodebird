@@ -1,16 +1,48 @@
 import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 import { Post, Comment, Image, User } from '../models/index.js';
 import { isLoggedIn, findPost } from './middlewares.js';
 
 const router = express.Router();
+try {
+  fs.accessSync('uploads');
+} catch (error) {
+  console.log('create uploads directory');
+  fs.mkdirSync('uploads');
+}
 
-router.post('/', isLoggedIn, async (req, res, next) => {
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, res, done) {
+      done(null, 'uploads');
+    },
+    filename(req, file, done) {
+      console.log(file.originalname);
+      const ext = path.extname(file.originalname);
+      const basename = path.basename(file.originalname, ext);
+      done(null, basename + '_' + new Date().getTime() + ext);
+    },
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 },
+});
+
+router.post('/', upload.none(), isLoggedIn, async (req, res, next) => {
   try {
+    let requestImage = req.body.image;
+    if (requestImage && !Array.isArray(requestImage))
+      requestImage = [requestImage];
+    const images = await Promise.all(
+      requestImage.map((image) => Image.create({ name: image }))
+    );
     const post = await Post.create({
       UserId: req.user.id,
       content: req.body.content,
     });
+    await post.addImages(images);
+
     const fullPost = await Post.findOne({
       where: {
         id: post.id,
@@ -39,6 +71,20 @@ router.post('/', isLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
+
+router.post(
+  '/images',
+  isLoggedIn,
+  upload.array('image'),
+  async (req, res, next) => {
+    try {
+      res.json(req.files.map((v) => v.filename));
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  }
+);
 
 router.post(
   '/:postId/comment',
@@ -86,7 +132,7 @@ router.patch(
   async (req, res, next) => {
     try {
       const post = res.locals.post;
-      await req.post.removeLikers(req.user.id);
+      await post.removeLikers(req.user.id);
       res.json({ PostId: post.id, UserId: req.user.id });
     } catch (error) {
       console.error(error);
