@@ -20,7 +20,6 @@ const upload = multer({
       done(null, 'uploads');
     },
     filename(req, file, done) {
-      console.log(file.originalname);
       const ext = path.extname(file.originalname);
       const basename = path.basename(file.originalname, ext);
       done(null, basename + '_' + new Date().getTime() + ext);
@@ -126,6 +125,89 @@ router.post(
   }
 );
 
+router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
+  try {
+    const post = await Post.findOne({
+      where: {
+        id: req.params.postId,
+      },
+      include: [
+        {
+          model: Post,
+          as: 'Retweet',
+        },
+      ],
+    });
+    if (!post) return req.status(403).send('Non-existent post');
+    if (
+      req.user.id === post.UserId ||
+      (post.Retweet && post.Retweet.UserId === req.user.id)
+    ) {
+      return res.status(403).send('Do not try to retweet your post');
+    }
+    const retweetTargetId = post.RetweetId || post.id;
+    const exPost = await Post.findOne({
+      where: {
+        UserId: req.user.id,
+        RetweetId: retweetTargetId,
+      },
+    });
+    if (exPost) {
+      return res.status(403).send('This post has already been retweeted');
+    }
+    const retweet = await Post.create({
+      UserId: req.user.id,
+      RetweetId: retweetTargetId,
+      content: 'retweet',
+    });
+    const retweetWithPrevPost = await Post.findOne({
+      where: {
+        id: retweet.id,
+      },
+      include: [
+        {
+          model: Post,
+          as: 'Retweet',
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'nickname'],
+            },
+            {
+              model: Image,
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: ['id', 'nickname'],
+        },
+        {
+          model: Image,
+        },
+        {
+          model: Comment,
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'nickname'],
+            },
+          ],
+        },
+        {
+          model: User,
+          as: 'Likers',
+          attributes: ['id'],
+        },
+      ],
+    });
+    res.json(retweetWithPrevPost);
+  } catch (error) {
+    console.error(error);
+    return next(error);
+  }
+});
+
 router.patch('/:postId/like', isLoggedIn, findPost, async (req, res, next) => {
   try {
     const post = res.locals.post;
@@ -155,7 +237,6 @@ router.patch(
 
 router.delete('/:postId', isLoggedIn, findPost, async (req, res, next) => {
   try {
-    console.log(req.params.id, req.user.id);
     await Post.destroy({
       where: { id: req.params.postId, UserId: req.user.id },
     });
