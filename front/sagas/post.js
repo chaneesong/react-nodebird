@@ -9,16 +9,18 @@ import {
   LIKE_POST,
   UNLIKE_POST,
   UPLOAD_IMAGES,
+  RETWEET,
 } from '../actions/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
 
-function loadPostAPI() {
-  return axios.get('/posts');
+function loadPostAPI(lastId) {
+  return axios.get(`/posts?lastId=${lastId || 0}`);
 }
 
-function* loadPost() {
+function* loadPost(action) {
   try {
-    const result = yield call(loadPostAPI);
+    const result = yield call(loadPostAPI, action.data);
+    console.log(result);
     yield put({
       type: LOAD_POSTS.success,
       data: result.data,
@@ -26,7 +28,7 @@ function* loadPost() {
   } catch (error) {
     yield put({
       type: LOAD_POSTS.failure,
-      data: error.response.data,
+      error: error.response.data,
     });
   }
 }
@@ -50,7 +52,7 @@ function* addPost(action) {
   } catch (error) {
     yield put({
       type: ADD_POST.failure,
-      data: error.response.data,
+      error: error.response.data,
     });
   }
 }
@@ -75,7 +77,7 @@ function* removePost(action) {
     console.error(error);
     yield put({
       type: REMOVE_POST.failure,
-      data: error.response.data,
+      error: error.response.data,
     });
   }
 }
@@ -95,7 +97,7 @@ function* addComment(action) {
     console.error(error);
     yield put({
       type: ADD_COMMENT.failure,
-      data: error.response.data,
+      error: error.response.data,
     });
   }
 }
@@ -115,7 +117,7 @@ function* likePost(action) {
     console.error(error);
     yield put({
       type: LIKE_POST.failure,
-      data: error.response.data,
+      error: error.response.data,
     });
   }
 }
@@ -135,7 +137,7 @@ function* unlikePost(action) {
     console.error(error);
     yield put({
       type: UNLIKE_POST.failure,
-      data: error.response.data,
+      error: error.response.data,
     });
   }
 }
@@ -155,7 +157,27 @@ function* uploadImages(action) {
     console.error(error);
     yield put({
       type: UPLOAD_IMAGES.failure,
-      data: error.response.data,
+      error: error.response.data,
+    });
+  }
+}
+
+function retweetAPI(data) {
+  return axios.post(`/post/${data}/retweet`);
+}
+
+function* retweet(action) {
+  try {
+    const result = yield call(retweetAPI, action.data);
+    yield put({
+      type: RETWEET.success,
+      data: result.data,
+    });
+  } catch (error) {
+    console.error(error);
+    yield put({
+      type: RETWEET.failure,
+      error: error.response.data,
     });
   }
 }
@@ -188,6 +210,10 @@ function* watchUploadImages() {
   yield takeLatest(UPLOAD_IMAGES.request, uploadImages);
 }
 
+function* watchRetweet() {
+  yield takeLatest(RETWEET.request, retweet);
+}
+
 export default function* postSaga() {
   yield all([
     fork(watchLoadPost),
@@ -197,5 +223,6 @@ export default function* postSaga() {
     fork(watchLikePost),
     fork(watchUnlikePost),
     fork(watchUploadImages),
+    fork(watchRetweet),
   ]);
 }
