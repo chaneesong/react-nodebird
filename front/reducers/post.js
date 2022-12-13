@@ -9,6 +9,7 @@ import {
   UNLIKE_POST,
   UPLOAD_IMAGES,
   REMOVE_IMAGE,
+  RETWEET,
 } from '../actions/post';
 
 export const initialState = {
@@ -36,6 +37,9 @@ export const initialState = {
   uploadImagesLoading: false,
   uploadImagesDone: false,
   uploadImagesError: null,
+  retweetLoading: false,
+  retweetDone: false,
+  retweetError: null,
 };
 
 export const addComment = (data) => ({
@@ -54,8 +58,8 @@ const reducer = (state = initialState, action) => {
       case LOAD_POSTS.success:
         draft.loadPostsLoading = false;
         draft.loadPostsDone = true;
-        draft.mainPosts = action.data.concat(draft.mainPosts);
-        draft.hasMorePosts = draft.mainPosts.length < 50;
+        draft.mainPosts = draft.mainPosts.concat(action.data);
+        draft.hasMorePosts = draft.mainPosts.length === 10;
         break;
       case LOAD_POSTS.failure:
         draft.loadPostsLoading = false;
@@ -150,6 +154,19 @@ const reducer = (state = initialState, action) => {
       case UPLOAD_IMAGES.failure:
         draft.uploadImagesLoading = false;
         draft.uploadImagesError = action.error;
+      case RETWEET.request:
+        draft.retweetLoading = true;
+        draft.retweetDone = false;
+        draft.retweetError = null;
+        break;
+      case RETWEET.success:
+        draft.retweetLoading = false;
+        draft.retweetDone = true;
+        draft.mainPosts.unshift(action.data);
+        break;
+      case RETWEET.failure:
+        draft.retweetLoading = false;
+        draft.retweetError = action.error;
       case REMOVE_IMAGE:
         draft.imagePaths = draft.imagePaths.filter((v, i) => i !== action.data);
         break;
