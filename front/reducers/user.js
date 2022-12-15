@@ -45,8 +45,6 @@ export const initialState = {
   loadFollowingsDone: false,
   loadFollowingsError: null,
   me: null,
-  signUpdata: {},
-  loginData: {},
 };
 
 export const ADD_POST_TO_ME = 'ADD_POST_TO_ME';
