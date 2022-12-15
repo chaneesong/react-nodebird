@@ -83,6 +83,56 @@ router.post('/', upload.none(), isLoggedIn, async (req, res, next) => {
   }
 });
 
+router.get('/:postId', findPost, async (req, res, next) => {
+  try {
+    const post = await Post.findOne({
+      where: { id: req.params.postId },
+    });
+
+    const fullPost = await Post.findOne({
+      where: { id: req.params.postId },
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'nickname'],
+        },
+        {
+          model: Image,
+        },
+        {
+          model: Comment,
+          include: {
+            model: User,
+            attributes: ['id', 'nickname'],
+          },
+        },
+        {
+          model: User,
+          as: 'Likers',
+          attributes: ['id'],
+        },
+        {
+          model: Post,
+          as: 'Retweet',
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'nickname'],
+            },
+            {
+              model: Image,
+            },
+          ],
+        },
+      ],
+    });
+    res.json(fullPost);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 router.post(
   '/images',
   isLoggedIn,
