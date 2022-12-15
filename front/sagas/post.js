@@ -10,16 +10,17 @@ import {
   UNLIKE_POST,
   UPLOAD_IMAGES,
   RETWEET,
+  LOAD_POST,
 } from '../actions/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
 
-function loadPostAPI(lastId) {
+function loadPostsAPI(lastId) {
   return axios.get(`/posts?lastId=${lastId || 0}`);
 }
 
-function* loadPost(action) {
+function* loadPosts(action) {
   try {
-    const result = yield call(loadPostAPI, action.data);
+    const result = yield call(loadPostsAPI, action.data);
     console.log(result);
     yield put({
       type: LOAD_POSTS.success,
@@ -28,6 +29,25 @@ function* loadPost(action) {
   } catch (error) {
     yield put({
       type: LOAD_POSTS.failure,
+      error: error.response.data,
+    });
+  }
+}
+
+function loadPostAPI(postId) {
+  return axios.get(`/post/${postId}`);
+}
+
+function* loadPost(action) {
+  try {
+    const result = yield call(loadPostAPI, action.data);
+    yield put({
+      type: LOAD_POST.success,
+      data: result.data,
+    });
+  } catch (error) {
+    yield put({
+      type: LOAD_POST.failure,
       error: error.response.data,
     });
   }
@@ -182,8 +202,12 @@ function* retweet(action) {
   }
 }
 
+function* watchLoadPosts() {
+  yield takeLatest(LOAD_POSTS.request, loadPosts);
+}
+
 function* watchLoadPost() {
-  yield takeLatest(LOAD_POSTS.request, loadPost);
+  yield takeLatest(LOAD_POST.request, loadPost);
 }
 
 function* watchAddPost() {
@@ -216,6 +240,7 @@ function* watchRetweet() {
 
 export default function* postSaga() {
   yield all([
+    fork(watchLoadPosts),
     fork(watchLoadPost),
     fork(watchAddPost),
     fork(watchRemovePost),

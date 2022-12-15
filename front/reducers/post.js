@@ -10,15 +10,20 @@ import {
   UPLOAD_IMAGES,
   REMOVE_IMAGE,
   RETWEET,
+  LOAD_POST,
 } from '../actions/post';
 
 export const initialState = {
   mainPosts: [],
   imagePaths: [],
+  singlePost: null,
   hasMorePosts: true,
   loadPostsLoading: false,
   loadPostsDone: false,
   loadPostsError: null,
+  loadPostLoading: false,
+  loadPostDone: false,
+  loadPostError: null,
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
@@ -64,6 +69,20 @@ const reducer = (state = initialState, action) => {
       case LOAD_POSTS.failure:
         draft.loadPostsLoading = false;
         draft.loadPostsError = action.error;
+        break;
+      case LOAD_POST.request:
+        draft.loadPostLoading = true;
+        draft.loadPostDone = false;
+        draft.loadPostError = null;
+        break;
+      case LOAD_POST.success:
+        draft.loadPostLoading = false;
+        draft.loadPostDone = true;
+        draft.singlePost = action.data;
+        break;
+      case LOAD_POST.failure:
+        draft.loadPostLoading = false;
+        draft.loadPostError = action.error;
         break;
       case ADD_POST.request:
         draft.addPostLoading = true;
