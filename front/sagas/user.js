@@ -8,6 +8,7 @@ import {
   FOLLOW,
   UNFOLLOW,
   LOAD_MY_INFO,
+  LOAD_USER,
   CHANGE_NICKNAME,
   LOAD_FOLLOWERS,
   LOAD_FOLLOWINGS,
@@ -28,6 +29,25 @@ function* loadMyInfo() {
   } catch (error) {
     yield put({
       type: LOAD_MY_INFO.failure,
+      error: error.response.data,
+    });
+  }
+}
+
+function loadUserAPI(userId) {
+  return axios.get(`/user/${userId}}`);
+}
+
+function* loadUser(action) {
+  try {
+    const result = yield call(loadUserAPI, action.data);
+    yield put({
+      type: LOAD_USER.success,
+      data: result.data,
+    });
+  } catch (error) {
+    yield put({
+      type: LOAD_USER.failure,
       error: error.response.data,
     });
   }
@@ -214,6 +234,10 @@ function* watchLoadMyInfo() {
   yield takeLatest(LOAD_MY_INFO.request, loadMyInfo);
 }
 
+function* watchLoadUser() {
+  yield takeLatest(LOAD_USER.request, loadUser);
+}
+
 function* watchLogIn() {
   yield takeLatest(LOG_IN.request, logIn);
 }
@@ -253,6 +277,7 @@ function* watchRemoveFollower() {
 export default function* userSaga() {
   yield all([
     fork(watchLoadMyInfo),
+    fork(watchLoadUser),
     fork(watchFollow),
     fork(watchUnfollow),
     fork(watchLogIn),

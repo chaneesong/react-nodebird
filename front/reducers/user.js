@@ -4,6 +4,7 @@ import {
   LOG_IN,
   LOG_OUT,
   SIGN_UP,
+  LOAD_USER,
   FOLLOW,
   UNFOLLOW,
   CHANGE_NICKNAME,
@@ -17,6 +18,9 @@ export const initialState = {
   loadMyInfoLoading: false,
   loadMyInfoDone: false,
   loadMyInfoError: null,
+  loadUserLoading: false,
+  loadUserDone: false,
+  loadUserError: null,
   logInLoading: false,
   logInDone: false,
   logInError: null,
@@ -44,6 +48,7 @@ export const initialState = {
   loadFollowingsLoading: false,
   loadFollowingsDone: false,
   loadFollowingsError: null,
+  userInfo: null,
   me: null,
 };
 
@@ -79,6 +84,20 @@ const reducer = (state = initialState, action) =>
       case LOAD_MY_INFO.failure:
         draft.loadMyInfoLoading = false;
         draft.loadMyInfoError = action.error;
+        break;
+      case LOAD_USER.request:
+        draft.loadUserLoading = true;
+        draft.loadUserDone = false;
+        draft.loadUserError = null;
+        break;
+      case LOAD_USER.success:
+        draft.loadUserLoading = false;
+        draft.loadUserDone = true;
+        draft.userInfo = action.data;
+        break;
+      case LOAD_USER.failure:
+        draft.loadUserLoading = false;
+        draft.loadUserError = action.error;
         break;
       case LOAD_FOLLOWERS.request:
         draft.loadFollowersLoading = true;

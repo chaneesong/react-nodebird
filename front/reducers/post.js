@@ -5,6 +5,8 @@ import {
   ADD_COMMENT,
   REMOVE_POST,
   LOAD_POSTS,
+  LOAD_USER_POSTS,
+  LOAD_HASHTAG_POSTS,
   LIKE_POST,
   UNLIKE_POST,
   UPLOAD_IMAGES,
@@ -55,18 +57,24 @@ export const addComment = (data) => ({
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
     switch (action.type) {
+      case LOAD_USER_POSTS.request:
       case LOAD_POSTS.request:
+      case LOAD_HASHTAG_POSTS.request:
         draft.loadPostsLoading = true;
         draft.loadPostsDone = false;
         draft.loadPostsError = null;
         break;
+      case LOAD_USER_POSTS.success:
       case LOAD_POSTS.success:
+      case LOAD_HASHTAG_POSTS.success:
         draft.loadPostsLoading = false;
         draft.loadPostsDone = true;
         draft.mainPosts = draft.mainPosts.concat(action.data);
         draft.hasMorePosts = draft.mainPosts.length === 10;
         break;
+      case LOAD_USER_POSTS.failure:
       case LOAD_POSTS.failure:
+      case LOAD_HASHTAG_POSTS.failure:
         draft.loadPostsLoading = false;
         draft.loadPostsError = action.error;
         break;
