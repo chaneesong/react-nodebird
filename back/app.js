@@ -11,6 +11,7 @@ import { sequelize } from './models/index.js';
 import userRouter from './router/user.js';
 import postRouter from './router/post.js';
 import postsRouter from './router/posts.js';
+import hashtagRouter from './router/hashtag.js';
 import passportConfig from './passport/index.js';
 import { fileURLToPath } from 'url';
 
@@ -54,6 +55,7 @@ app.use('/', express.static(path.join(__dirname, 'uploads')));
 app.use('/user', userRouter);
 app.use('/post', postRouter);
 app.use('/posts', postsRouter);
+app.use('/hashtag', hashtagRouter);
 
 app.listen(app.get('port'), () => {
   console.log('listening');

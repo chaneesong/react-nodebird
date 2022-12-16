@@ -1,13 +1,49 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import passport from 'passport';
+import { Op } from 'sequelize';
 
-import { User, Post } from '../models/index.js';
+import { User, Post, Image, Comment } from '../models/index.js';
 import { findUser, isLoggedIn, isNotLoggedIn } from './middlewares.js';
 
 const router = express.Router();
 
 router.get('/', async (req, res, next) => {
+  try {
+    if (req.user) {
+      const fullUserWithoutPassword = await User.findOne({
+        where: { id: req.user.id },
+        attributes: {
+          exclude: ['password'],
+        },
+        include: [
+          {
+            model: Post,
+            attributes: ['id'],
+          },
+          {
+            model: User,
+            as: 'Followings',
+            attributes: ['id'],
+          },
+          {
+            model: User,
+            as: 'Followers',
+            attributes: ['id'],
+          },
+        ],
+      });
+      res.status(200).json(fullUserWithoutPassword);
+    } else {
+      res.status(200).json(null);
+    }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.get('/:userId', findUser, async (req, res, next) => {
   try {
     if (!req.user) return res.status(200).json(null);
     const fullUserWithoutPassword = await User.findOne({
@@ -37,6 +73,61 @@ router.get('/', async (req, res, next) => {
       ],
     });
     return res.status(200).json(fullUserWithoutPassword);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.get('/:userId/posts', async (req, res, next) => {
+  try {
+    const where = { UserId: req.params.userId };
+    if (parseInt(req.query.lastId, 10)) {
+      where.id = { [Op.lt]: parseInt(req.query.lastId, 10) };
+    }
+    const posts = await Post.findAll({
+      where,
+      limit: 10,
+      order: [['createdAt', 'DESC']],
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'nickname'],
+        },
+        {
+          model: Image,
+        },
+        {
+          model: Comment,
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'nickname'],
+              order: [['createdAt', 'DESC']],
+            },
+          ],
+        },
+        {
+          model: User, // 좋아요 누른 사람
+          as: 'Likers',
+          attributes: ['id'],
+        },
+        {
+          model: Post,
+          as: 'Retweet',
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'nickname'],
+            },
+            {
+              model: Image,
+            },
+          ],
+        },
+      ],
+    });
+    res.status(200).json(posts);
   } catch (error) {
     console.error(error);
     next(error);
