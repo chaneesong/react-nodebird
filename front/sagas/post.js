@@ -6,6 +6,8 @@ import {
   ADD_COMMENT,
   REMOVE_POST,
   LOAD_POSTS,
+  LOAD_USER_POSTS,
+  LOAD_HASHTAG_POSTS,
   LIKE_POST,
   UNLIKE_POST,
   UPLOAD_IMAGES,
@@ -20,8 +22,7 @@ function loadPostsAPI(lastId) {
 
 function* loadPosts(action) {
   try {
-    const result = yield call(loadPostsAPI, action.data);
-    console.log(result);
+    const result = yield call(loadPostsAPI, action.lastId);
     yield put({
       type: LOAD_POSTS.success,
       data: result.data,
@@ -29,6 +30,48 @@ function* loadPosts(action) {
   } catch (error) {
     yield put({
       type: LOAD_POSTS.failure,
+      error: error.response.data,
+    });
+  }
+}
+
+function loadUserPostsAPI(data, lastId) {
+  return axios.get(`/user/${data}/posts?lastId=${lastId || 0}`);
+}
+
+function* loadUserPosts(action) {
+  try {
+    const result = yield call(loadUserPostsAPI, action.data, action.lastId);
+    console.log(result);
+    yield put({
+      type: LOAD_USER_POSTS.success,
+      data: result.data,
+    });
+  } catch (error) {
+    yield put({
+      type: LOAD_USER_POSTS.failure,
+      error: error.response.data,
+    });
+  }
+}
+
+function loadHashtagPostsAPI(data, lastId) {
+  return axios.get(
+    `/hashtag/${encodeURIComponent(data)}?lastId=${lastId || 0}`
+  );
+}
+
+function* loadHashtagPosts(action) {
+  try {
+    const result = yield call(loadHashtagPostsAPI, action.data, action.lastId);
+    console.log(result);
+    yield put({
+      type: LOAD_HASHTAG_POSTS.success,
+      data: result.data,
+    });
+  } catch (error) {
+    yield put({
+      type: LOAD_HASHTAG_POSTS.failure,
       error: error.response.data,
     });
   }
@@ -205,6 +248,12 @@ function* retweet(action) {
 function* watchLoadPosts() {
   yield takeLatest(LOAD_POSTS.request, loadPosts);
 }
+function* watchLoadUserPosts() {
+  yield takeLatest(LOAD_USER_POSTS.request, loadUserPosts);
+}
+function* watchLoadHashtagPosts() {
+  yield takeLatest(LOAD_HASHTAG_POSTS.request, loadHashtagPosts);
+}
 
 function* watchLoadPost() {
   yield takeLatest(LOAD_POST.request, loadPost);
@@ -241,6 +290,8 @@ function* watchRetweet() {
 export default function* postSaga() {
   yield all([
     fork(watchLoadPosts),
+    fork(watchLoadUserPosts),
+    fork(watchLoadHashtagPosts),
     fork(watchLoadPost),
     fork(watchAddPost),
     fork(watchRemovePost),
