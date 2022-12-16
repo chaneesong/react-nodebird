@@ -1,24 +1,25 @@
 import express from 'express';
 import { Op } from 'sequelize';
-import { Post, User, Comment, Image } from '../models/index.js';
+
+import { Post, User, Comment, Image, Hashtag } from '../models/index.js';
 
 const router = express.Router();
 
-router.get('/', async (req, res, next) => {
+router.get('/:hashtag', async (req, res, next) => {
   try {
     const where = {};
-    const lastId = parseInt(req.query.lastId, 10);
-    if (lastId) {
-      where.id = { [Op.lt]: lastId };
+    if (parseInt(req.query.lastId, 10)) {
+      where.id = { [Op.lt]: parseInt(req.query.lastId, 10) };
     }
     const posts = await Post.findAll({
       where,
       limit: 10,
-      order: [
-        ['createdAt', 'DESC'],
-        [Comment, 'createdAt', 'DESC'],
-      ],
+      order: [['createdAt', 'DESC']],
       include: [
+        {
+          model: Hashtag,
+          where: { name: decodeURIComponent(req.params.hashtag) },
+        },
         {
           model: User,
           attributes: ['id', 'nickname'],
@@ -28,10 +29,13 @@ router.get('/', async (req, res, next) => {
         },
         {
           model: Comment,
-          include: {
-            model: User,
-            attributes: ['id', 'nickname'],
-          },
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'nickname'],
+              order: [['createdAt', 'DESC']],
+            },
+          ],
         },
         {
           model: User,
@@ -53,7 +57,8 @@ router.get('/', async (req, res, next) => {
         },
       ],
     });
-    res.json(posts);
+    console.log('posts=', posts, decodeURIComponent(req.params.hashtag));
+    res.status(200).json(posts);
   } catch (error) {
     console.error(error);
     next(error);

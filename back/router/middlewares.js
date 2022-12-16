@@ -39,8 +39,7 @@ const findUser = async (req, res, next) => {
         id,
       },
     });
-    console.log(user);
-    if (!user) return req.status(403).send('Non-existent user');
+    if (!user) return res.status(403).send('Non-existent user');
     res.locals.user = user;
     next();
   } catch (error) {
