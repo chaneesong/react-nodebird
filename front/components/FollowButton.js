@@ -18,6 +18,10 @@ const FollowButton = ({ post }) => {
     dispatch({ type: FOLLOW.request, data: post.User.id });
   }, [isFollowing]);
 
+  if (post.User.id === me.id) {
+    return null;
+  }
+
   return (
     <Button loading={followLoading || unfollowLoading} onClick={onClickButton}>
       {isFollowing ? 'Unfollow' : 'follow'}
