@@ -42,14 +42,6 @@ const menuItems = (searchInput, onChangeSearchInput, onSearch) => [
       />
     ),
   },
-  {
-    key: 'SignUp',
-    label: (
-      <Link href='/signup'>
-        <a>Sign Up</a>
-      </Link>
-    ),
-  },
 ];
 
 const AppLayout = ({ children }) => {
