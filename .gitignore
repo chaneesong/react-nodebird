@@ -1,6 +1,7 @@
 ### Node ###
 
 uploads/
+*.pem
 
 # Logs
 logs
