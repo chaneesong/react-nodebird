@@ -9,6 +9,7 @@ import { LOAD_POST } from '../../actions/post';
 import { LOAD_MY_INFO } from '../../actions/user';
 import AppLayout from '../../components/AppLayout';
 import PostCard from '../../components/PostCard';
+import backURL from '../../config';
 
 const Post = () => {
   const router = useRouter();
@@ -25,7 +26,7 @@ const Post = () => {
         />
         <meta property='og:description' content={singlePost.content} />
         <meta property='og:image' content={singlePost.content} />
-        <meta property='og:url' content={`http://localhost:3060/post/${id}`} />
+        <meta property='og:url' content={`${backURL}/post/${id}`} />
       </Head>
       singlePost ? <PostCard post={singlePost} />
     </AppLayout>

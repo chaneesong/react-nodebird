@@ -18,10 +18,6 @@ const Profile = () => {
     }
   }, [me && me.id]);
 
-  if (!me) {
-    return null;
-  }
-
   useEffect(() => {
     dispatch({
       type: LOAD_FOLLOWERS.request,
@@ -30,6 +26,10 @@ const Profile = () => {
       type: LOAD_FOLLOWINGS.request,
     });
   }, []);
+
+  if (!me) {
+    return null;
+  }
 
   return (
     <>
