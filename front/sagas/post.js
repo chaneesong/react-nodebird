@@ -13,6 +13,7 @@ import {
   UPLOAD_IMAGES,
   RETWEET,
   LOAD_POST,
+  EDIT_POST,
 } from '../actions/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
 
@@ -145,6 +146,27 @@ function* removePost(action) {
   }
 }
 
+function editPostAPI(data) {
+  return axios.patch(`/post/${data.PostId}`, data);
+}
+
+function* editPost(action) {
+  try {
+    const result = yield call(editPostAPI, action.data);
+
+    yield put({
+      type: EDIT_POST.success,
+      data: result.data,
+    });
+  } catch (error) {
+    console.error(error);
+    yield put({
+      type: EDIT_POST.failure,
+      error: error.response.data,
+    });
+  }
+}
+
 function addCommentAPI(data) {
   return axios.post(`/post/${data.postId}/comment`, data);
 }
@@ -267,6 +289,10 @@ function* watchRemovePost() {
   yield takeLatest(REMOVE_POST.request, removePost);
 }
 
+function* watchEditPost() {
+  yield takeLatest(EDIT_POST.request, editPost);
+}
+
 function* watchAddComment() {
   yield takeLatest(ADD_COMMENT.request, addComment);
 }
@@ -295,6 +321,7 @@ export default function* postSaga() {
     fork(watchLoadPost),
     fork(watchAddPost),
     fork(watchRemovePost),
+    fork(watchEditPost),
     fork(watchAddComment),
     fork(watchLikePost),
     fork(watchUnlikePost),

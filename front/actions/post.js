@@ -3,6 +3,7 @@ import { createAsyncActions } from '../utils/factory';
 export const ADD_POST = createAsyncActions('ADD_POST');
 export const ADD_COMMENT = createAsyncActions('ADD_COMMENT');
 export const REMOVE_POST = createAsyncActions('REMOVE_POST');
+export const EDIT_POST = createAsyncActions('EDIT_POST');
 export const LOAD_POSTS = createAsyncActions('LOAD_POSTS');
 export const LOAD_USER_POSTS = createAsyncActions('LOAD_USER_POSTS');
 export const LOAD_HASHTAG_POSTS = createAsyncActions('LOAD_HASHTAG_POSTS');

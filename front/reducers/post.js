@@ -13,6 +13,7 @@ import {
   REMOVE_IMAGE,
   RETWEET,
   LOAD_POST,
+  EDIT_POST,
 } from '../actions/post';
 
 export const initialState = {
@@ -32,6 +33,9 @@ export const initialState = {
   removePostLoading: false,
   removePostDone: false,
   removePostError: null,
+  editPostLoading: false,
+  editPostDone: false,
+  editPostError: null,
   addCommentLoading: false,
   addCommentDone: false,
   addCommentError: null,
@@ -119,6 +123,21 @@ const reducer = (state = initialState, action) => {
         draft.removePostDone = true;
         break;
       case REMOVE_POST.failure:
+        draft.removePostLoading = false;
+        draft.removePostError = action.error;
+        break;
+      case EDIT_POST.request:
+        draft.editPostLoading = true;
+        draft.editPostDone = false;
+        draft.editPostError = null;
+        break;
+      case EDIT_POST.success:
+        draft.mainPosts.find((v) => v.id === action.data.PostId).content =
+          action.data.content;
+        draft.editPostLoading = false;
+        draft.editPostDone = true;
+        break;
+      case EDIT_POST.failure:
         draft.removePostLoading = false;
         draft.removePostError = action.error;
         break;
