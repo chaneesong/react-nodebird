@@ -287,6 +287,44 @@ router.patch(
   }
 );
 
+router.patch('/:postId', isLoggedIn, findPost, async (req, res, next) => {
+  const hashtags = req.body.content.match(/#[^\s#]+/g);
+  try {
+    const post = res.locals.post;
+    await post.update(
+      {
+        content: req.body.content,
+      },
+      {
+        where: {
+          id: req.params.postId,
+          UserId: req.user.id,
+        },
+      }
+    );
+    const changedPost = await Post.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (hashtags) {
+      const result = await Promise.all(
+        hashtags.map((tag) =>
+          Hashtag.findOrCreate({ where: { name: tag.slice(1).toLowerCase() } })
+        )
+      );
+      await changedPost.setHashtags(result.map((v) => v[0]));
+    }
+    res.json({
+      PostId: parseInt(req.params.postId),
+      content: req.body.content,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 router.delete('/:postId', isLoggedIn, findPost, async (req, res, next) => {
   try {
     await Post.destroy({
