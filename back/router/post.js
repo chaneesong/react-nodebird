@@ -139,7 +139,9 @@ router.post(
   upload.array('image'),
   async (req, res, next) => {
     try {
-      res.json(req.files.map((v) => v.filename));
+      res.json(
+        req.files.map((v) => v.location.replace(/\/original\//, '/thumb/'))
+      );
     } catch (error) {
       console.error(error);
       next(error);
