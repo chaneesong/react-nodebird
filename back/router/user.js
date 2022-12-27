@@ -109,10 +109,10 @@ router.patch('/:userId/follow', findUser, async (req, res, next) => {
   }
 });
 
-router.delete('/:userId/follow', findUser, async (req, res, next) => {
+router.delete('/follow/:userId', findUser, async (req, res, next) => {
   try {
     const user = res.locals.user;
-    await user.removeFollowers(req.user.id);
+    await user.removeFollowings(req.user.id);
     return res.status(200).json({ userId: parseInt(req.params.userId, 10) });
   } catch (error) {
     console.error(error);
@@ -120,10 +120,10 @@ router.delete('/:userId/follow', findUser, async (req, res, next) => {
   }
 });
 
-router.delete('/follower/:userId', findUser, async (req, res, next) => {
+router.delete('/:userId/follow', findUser, async (req, res, next) => {
   try {
     const user = res.locals.user;
-    await user.removeFollowings(req.user.id);
+    await user.removeFollowers(req.user.id);
     return res.status(200).json({ userId: parseInt(req.params.userId, 10) });
   } catch (error) {
     console.error(error);
